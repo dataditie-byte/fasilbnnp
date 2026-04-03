@@ -341,7 +341,7 @@
             <div class="section">
               <h3>Kepala Desa/Lurah</h3>
               <div class="line"><strong>Nama:</strong> ${escapeHtml(d.namaKades || "-")}</div>
-              <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpKades || "-")}</div>
+              <div class="line"><strong>No HP:</strong> ${escapeHtml(maskPhone(d.hpKades))}</div>
               <div class="btn-group">
                 ${d.hpKades ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpKades)}">📞 Call Kades/Lurah</a>` : ``}
                 ${d.waKades ? `<a class="btn btn-wa" href="${escapeAttr(d.waKades)}" target="_blank">💬 WA Kades/Lurah</a>` : ``}
@@ -434,7 +434,12 @@
 
       return "https://www.google.com/maps?q=" + encodeURIComponent(link);
     }
-
+function maskPhone(phone) {
+  if (!phone) return "-";
+  phone = String(phone).trim();
+  if (phone.length <= 4) return "xxxx";
+  return phone.slice(0, -4) + "xxxx";
+}
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, "&amp;")
