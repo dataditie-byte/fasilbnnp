@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fasilitator P4GN Kalbar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; padding: 10px; background:#f5f7fa;}
+    input, select { padding:10px; width:100%; margin:5px 0;}
+    .card {
+      background:white; padding:12px; margin:10px 0;
+      border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    }
+    .btn { padding:6px 10px; margin:3px; border:none; border-radius:6px; cursor:pointer;}
+    .wa { background:#25D366; color:white;}
+    .call { background:#007bff; color:white;}
+    .map { background:#f39c12; color:white;}
+  </style>
+</head>
+
+<body>
+
+<h3>📍 Fasilitator P4GN Kalbar</h3>
+
+<input type="text" id="search" placeholder="Cari nama desa...">
+<select id="filterKab">
+  <option value="">Semua Kabupaten</option>
+</select>
+
+<div id="data"></div>
+
+<script>
+let data = [];
+
+// 👉 GANTI DENGAN LINK GOOGLE SHEETS CSV
+const sheetURL = "https://docs.google.com/spreadsheets/d/1tLRd5leD8aCt59PEORwXNHmpf1ZAq6UaRnNQpFYsykc/export?format=csv";
+
+fetch(sheetURL)
+.then(res => res.text())
+.then(csv => {
+  const rows = csv.split("\n").slice(1);
+  data = rows.map(r => {
+    const c = r.split(",");
+    return {
+      kab: c[0],
+      kec: c[1],
+      desa: c[2],
+      nama: c[3],
+      hp: c[4],
+      wa: c[5],
+      maps: c[6]
+    }
+  });
+  loadKab();
+  render(data);
+});
+
+function loadKab(){
+  let unik = [...new Set(data.map(d=>d.kab))];
+  let select = document.getElementById("filterKab");
+  unik.forEach(k=>{
+    let opt = document.createElement("option");
+    opt.value=k; opt.text=k;
+    select.appendChild(opt);
+  });
+}
+
+function render(list){
+  let html="";
+  list.forEach(d=>{
+    html += `
+    <div class="card">
+      <b>${d.desa}</b><br>
+      ${d.kec} - ${d.kab}<br>
+      PIC: ${d.nama}<br>
+      <button class="btn call" onclick="window.location.href='tel:${d.hp}'">📞 Call</button>
+      <button class="btn wa" onclick="window.open('${d.wa}')">💬 WA</button>
+      <button class="btn map" onclick="window.open('${d.maps}')">📍 Maps</button>
+    </div>`;
+  });
+  document.getElementById("data").innerHTML = html;
+}
+
+document.getElementById("search").onkeyup = function(){
+  let val = this.value.toLowerCase();
+  filter(val, document.getElementById("filterKab").value);
+}
+
+document.getElementById("filterKab").onchange = function(){
+  filter(document.getElementById("search").value, this.value);
+}
+
+function filter(text, kab){
+  let res = data.filter(d =>
+    d.desa.toLowerCase().includes(text.toLowerCase()) &&
+    (kab=="" || d.kab==kab)
+  );
+  render(res);
+}
+</script>
+
+</body>
+</html>
