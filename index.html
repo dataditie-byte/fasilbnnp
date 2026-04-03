@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Fasilitator P4GN BNNP Kalbar</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -155,21 +153,10 @@
       display: inline-block;
     }
 
-    .btn-call {
-      background: #0b5cab;
-    }
-
-    .btn-wa {
-      background: #25D366;
-    }
-
-    .btn-map {
-      background: #f39c12;
-    }
-
-    .btn-copy {
-      background: #6b7280;
-    }
+    .btn-call { background: #0b5cab; }
+    .btn-wa { background: #25D366; }
+    .btn-map { background: #f39c12; }
+    .btn-copy { background: #6b7280; }
 
     .keterangan {
       margin-top: 10px;
@@ -198,17 +185,9 @@
     }
 
     @media (max-width: 900px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .filter-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .header h1 {
-        font-size: 19px;
-      }
+      .cards { grid-template-columns: 1fr; }
+      .filter-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 19px; }
     }
   </style>
 </head>
@@ -252,9 +231,7 @@
 
     fetch(sheetURL)
       .then(res => {
-        if (!res.ok) {
-          throw new Error("Gagal mengambil data dari Google Sheets");
-        }
+        if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheets");
         return res.text();
       })
       .then(csv => {
@@ -279,7 +256,8 @@
             waPic: c[10] || "",
             supervisor: c[11] || "",
             hpSupervisor: c[12] || "",
-            keterangan: c[13] || ""
+            waSupervisor: c[13] || "",
+            keterangan: c[14] || ""
           };
         });
 
@@ -355,7 +333,7 @@
             ${
               d.maps
                 ? `<div class="btn-group">
-                    <a class="btn btn-map" href="${escapeAttr(d.maps)}" target="_blank">📍 Buka Maps</a>
+                    <a class="btn btn-map" href="${escapeAttr(formatMapLink(d.maps))}" target="_blank">📍 Buka Maps</a>
                   </div>`
                 : ``
             }
@@ -388,6 +366,7 @@
               <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpSupervisor || "-")}</div>
               <div class="btn-group">
                 ${d.hpSupervisor ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpSupervisor)}">📞 Call Supervisor</a>` : ``}
+                ${d.waSupervisor ? `<a class="btn btn-wa" href="${escapeAttr(d.waSupervisor)}" target="_blank">💬 WA Supervisor</a>` : ``}
                 ${d.hpSupervisor ? `<button class="btn btn-copy" onclick="copyText('${escapeJs(d.hpSupervisor)}')">📋 Copy No HP</button>` : ``}
               </div>
             </div>
@@ -439,6 +418,21 @@
       navigator.clipboard.writeText(text)
         .then(() => alert("Nomor berhasil disalin"))
         .catch(() => alert("Gagal menyalin nomor"));
+    }
+
+    function formatMapLink(link) {
+      if (!link) return "#";
+      link = link.trim();
+
+      if (link.startsWith("http://") || link.startsWith("https://")) {
+        return link;
+      }
+
+      if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(link)) {
+        return "https://www.google.com/maps?q=" + encodeURIComponent(link);
+      }
+
+      return "https://www.google.com/maps?q=" + encodeURIComponent(link);
     }
 
     function escapeHtml(str) {
