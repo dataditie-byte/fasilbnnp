@@ -14,13 +14,60 @@
       color: #1f2937;
     }
 
-    .header {
-      background: linear-gradient(135deg, #003366, #0b5cab);
-      color: white;
-      padding: 18px 16px;
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-    }
+.header {
+  background: linear-gradient(135deg, #003366, #0b5cab);
+  color: white;
+  padding: 18px 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: white;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.header-text h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.header-text p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .header-inner {
+    text-align: center;
+  }
+
+  .header-text h1 {
+    font-size: 20px;
+  }
+
+  .logo {
+    width: 64px;
+    height: 64px;
+  }
+}
 
     .header h1 {
       margin: 0;
@@ -193,10 +240,15 @@
 </head>
 <body>
 
-  <div class="header">
-    <h1>Dashboard Fasilitator P4GN BNNP Kalbar</h1>
-    <p>Pencarian Desa/Kelurahan, PIC, Kepala Desa/Lurah, dan Supervisor</p>
+<div class="header">
+  <div class="header-inner">
+    <img src="logo-bnnp.png" alt="Logo BNNP Kalbar" class="logo">
+    <div class="header-text">
+      <h1>Dashboard Fasilitator P4GN BNNP Kalbar</h1>
+      <p>Pencarian Desa/Kelurahan, PIC, Kepala Desa/Lurah, dan Supervisor</p>
+    </div>
   </div>
+</div>
 
   <div class="container">
     <div class="filter-box">
