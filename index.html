@@ -603,7 +603,7 @@
           <div class="section">
             <h3>Fasilitator</h3>
             <div class="line"><strong>Nama:</strong> ${escapeHtml(d.namaPic || "-")}</div>
-            <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpPic || "-")}</div>
+            <div class="line"><strong>No HP:</strong> ${escapeHtml(maskPhone(d.hpPic))}</div>
             <div class="btn-group">
               ${d.hpPic ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpPic)}">📞 Call Fasilitator</a>` : ``}
               ${d.waPic ? `<a class="btn btn-wa" href="${escapeAttr(d.waPic)}" target="_blank">💬 WA Fasilitator</a>` : ``}
@@ -614,7 +614,7 @@
           <div class="section">
             <h3>Supervisor</h3>
             <div class="line"><strong>Nama:</strong> ${escapeHtml(d.supervisor || "-")}</div>
-            <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpSupervisor || "-")}</div>
+            <div class="line"><strong>No HP:</strong> ${escapeHtml(maskPhone(d.hpSupervisor))}</div>
             <div class="btn-group">
               ${d.hpSupervisor ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpSupervisor)}">📞 Call Supervisor</a>` : ``}
               ${d.waSupervisor ? `<a class="btn btn-wa" href="${escapeAttr(d.waSupervisor)}" target="_blank">💬 WA Supervisor</a>` : ``}
@@ -678,9 +678,9 @@
       <div class="popup-line"><strong>Kepala Desa/Lurah:</strong> ${escapeHtml(d.namaKades || "-")}</div>
       <div class="popup-line"><strong>No HP Kades/Lurah:</strong> ${escapeHtml(maskPhone(d.hpKades))}</div>
       <div class="popup-line"><strong>Fasilitator:</strong> ${escapeHtml(d.namaPic || "-")}</div>
-      <div class="popup-line"><strong>No HP Fasilitator:</strong> ${escapeHtml(d.hpPic || "-")}</div>
+      <div class="popup-line"><strong>No HP Fasilitator:</strong> ${escapeHtml(maskPhone(d.hpPic))}</div>
       <div class="popup-line"><strong>Supervisor:</strong> ${escapeHtml(d.supervisor || "-")}</div>
-      <div class="popup-line"><strong>No HP Supervisor:</strong> ${escapeHtml(d.hpSupervisor || "-")}</div>
+      <div class="popup-line"><strong>No HP Supervisor:</strong> ${escapeHtml(maskPhone(d.hpSupervisor))}</div>
       <div class="popup-line"><strong>Keterangan:</strong> ${escapeHtml(d.keterangan || "-")}</div>
       ${
         d.maps
