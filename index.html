@@ -1,161 +1,728 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Fasilitator P4GN BNNP Kalbar</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Fasilitator P4GN BNNP Kalbar</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<style>
-body { margin:0; font-family:Arial; background:#f3f6fb;}
-.header {background:linear-gradient(135deg,#003366,#0b5cab);color:white;padding:16px;text-align:center}
-.container{max-width:1100px;margin:auto;padding:16px}
+  <style>
+    * { box-sizing: border-box; }
 
-.tabs{display:flex;gap:10px;margin-bottom:15px}
-.tab{padding:10px 14px;border-radius:10px;background:#e5e7eb;cursor:pointer}
-.tab.active{background:#0b5cab;color:white}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f6fb;
+      color: #1f2937;
+    }
 
-.section{display:none}
-.section.active{display:block}
+    .header {
+      background: linear-gradient(135deg, #003366, #0b5cab);
+      color: white;
+      padding: 18px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
 
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card{background:white;padding:14px;border-radius:12px}
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      text-align: left;
+    }
 
-#map{height:70vh;border-radius:12px}
+    .logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 50%;
+      background: white;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
 
-input,select{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%}
-.filter{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
-</style>
+    .header-text h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .header-text p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      opacity: 0.95;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: #e7eef8;
+      color: #0b5cab;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: #0b5cab;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .filter-box {
+      background: white;
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      border-color: #0b5cab;
+      box-shadow: 0 0 0 3px rgba(11,92,171,0.12);
+    }
+
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .badge {
+      background: #e8f1fb;
+      color: #0b5cab;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+
+    .muted {
+      color: #6b7280;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border-left: 6px solid #0b5cab;
+    }
+
+    .desa-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 6px;
+    }
+
+    .wilayah {
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 10px;
+    }
+
+    .section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .section h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #0b5cab;
+    }
+
+    .line {
+      margin: 4px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-call { background: #0b5cab; }
+    .btn-wa { background: #25D366; }
+    .btn-map { background: #f39c12; }
+    .btn-copy { background: #6b7280; }
+
+    .keterangan {
+      margin-top: 10px;
+      background: #fff8e8;
+      color: #7a5a00;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      border: 1px solid #f5df9b;
+    }
+
+    .empty {
+      background: white;
+      text-align: center;
+      padding: 30px 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      color: #6b7280;
+    }
+
+    #map {
+      height: 72vh;
+      min-height: 520px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border: 1px solid #dbe3ee;
+    }
+
+    .map-note {
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .popup-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 8px;
+    }
+
+    .popup-line {
+      margin: 4px 0;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+      padding: 20px 10px 30px;
+    }
+
+    @media (max-width: 1000px) {
+      .cards { grid-template-columns: 1fr; }
+      .filter-grid { grid-template-columns: 1fr; }
+      .header-inner { text-align: center; }
+      .header-text h1 { font-size: 20px; }
+      .logo { width: 64px; height: 64px; }
+    }
+  </style>
 </head>
-
 <body>
 
 <div class="header">
-<h2>Dashboard Fasilitator P4GN BNNP Kalbar</h2>
+  <div class="header-inner">
+    <img src="logo-bnnp.png" alt="Logo BNNP Kalbar" class="logo">
+    <div class="header-text">
+      <h1>Dashboard Fasilitator P4GN BNNP Kalbar</h1>
+      <p>Pencarian Desa/Kelurahan, Fasilitator, Kepala Desa/Lurah, Supervisor, dan Data Peta</p>
+    </div>
+  </div>
 </div>
 
 <div class="container">
 
-<div class="tabs">
-<div class="tab active" onclick="showTab('data')">Data Tabel</div>
-<div class="tab" onclick="showTab('map')">Berbasis Peta</div>
-</div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tabData">Data Tabel</button>
+    <button class="tab-btn" data-tab="tabMap">Data Peta</button>
+  </div>
 
-<div class="filter">
-<input id="search" placeholder="Cari data...">
-<select id="kab"></select>
-<select id="kec"></select>
-</div>
+  <div class="filter-box">
+    <div class="filter-grid">
+      <input type="text" id="searchInput" placeholder="Cari desa, kecamatan, fasilitator, kades/lurah, supervisor..." />
 
-<div id="data" class="section active">
-<div id="cards" class="cards"></div>
-</div>
+      <select id="kabFilter">
+        <option value="">Semua Kabupaten/Kota</option>
+      </select>
 
-<div id="map" class="section"></div>
+      <select id="kecFilter">
+        <option value="">Semua Kecamatan</option>
+      </select>
 
+      <select id="fasFilter">
+        <option value="">Semua Data</option>
+        <option value="ada">Hanya yang ada Fasilitator</option>
+        <option value="kosong">Hanya yang belum ada Fasilitator</option>
+      </select>
+
+      <select id="ketFilter">
+        <option value="">Semua Keterangan</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <div class="badge" id="totalData">Total data: 0</div>
+    <div class="muted" id="mapReadyInfo">Titik peta siap: 0</div>
+    <div class="muted">Data ditarik dari Google Sheets</div>
+  </div>
+
+  <div id="tabData" class="tab-content active">
+    <div id="cardsContainer" class="cards"></div>
+  </div>
+
+  <div id="tabMap" class="tab-content">
+    <div class="map-note">
+      Klik marker untuk melihat informasi lengkap desa/kelurahan, kepala desa/lurah, fasilitator, supervisor, dan keterangan.
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <div class="footer">
+    Dashboard Fasilitator P4GN BNNP Kalbar
+  </div>
 </div>
 
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPyuoCrNpaEwPjcRJVIznXvqZDPE3jtl66VlIUy10slnRIxO_gyKN4HCVKAY1p_mFAhgtv_t0XTJdJ/pub?gid=362240994&single=true&output=csv";
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPyuoCrNpaEwPjcRJVIznXvqZDPE3jtl66VlIUy10slnRIxO_gyKN4HCVKAY1p_mFAhgtv_t0XTJdJ/pub?gid=362240994&single=true&output=csv";
 
-let data = [];
-let map, markers=[];
+  let allData = [];
+  let filteredData = [];
+  let map;
+  let markersLayer;
 
-fetch(CSV_URL)
-.then(res=>res.text())
-.then(csv=>{
-const rows = csv.split("\n").slice(1);
+  fetch(CSV_URL)
+    .then(res => {
+      if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheets");
+      return res.text();
+    })
+    .then(csv => {
+      const rows = csv.trim().split("\n").slice(1);
 
-data = rows.map(r=>{
-let c=r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-return {
-kab:c[0], kec:c[1], desa:c[2], alamat:c[3], maps:c[4],
-kades:c[5], hpKades:c[6], waKades:c[7],
-pic:c[8], hpPic:c[9], waPic:c[10],
-sup:c[11], hpSup:c[12], waSup:c[13],
-ket:c[14],
-lat:parseFloat(c[15]), lng:parseFloat(c[16])
-};
-});
+      allData = rows.map(row => {
+        const c = row
+          .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+          .map(v => v.replace(/^"|"$/g, "").trim());
 
-initFilter();
-render();
-initMap();
-});
+        return {
+          kabupaten: c[0] || "",
+          kecamatan: c[1] || "",
+          desa: c[2] || "",
+          alamat: c[3] || "",
+          maps: c[4] || "",
+          namaKades: c[5] || "",
+          hpKades: c[6] || "",
+          waKades: c[7] || "",
+          namaPic: c[8] || "",
+          hpPic: c[9] || "",
+          waPic: c[10] || "",
+          supervisor: c[11] || "",
+          hpSupervisor: c[12] || "",
+          waSupervisor: c[13] || "",
+          keterangan: c[14] || "",
+          latitude: parseCoordinate(c[15]),
+          longitude: parseCoordinate(c[16])
+        };
+      });
 
-function initFilter(){
-let kabSet=[...new Set(data.map(d=>d.kab))];
-document.getElementById("kab").innerHTML="<option value=''>Kabupaten</option>"+kabSet.map(k=>`<option>${k}</option>`).join("");
+      populateKabupaten();
+      populateKeterangan();
+      populateKecamatan(allData);
+      initMap();
+      applyFilters();
+    })
+    .catch(error => {
+      console.error(error);
+      document.getElementById("cardsContainer").innerHTML = `
+        <div class="empty">
+          Gagal memuat data. Pastikan Google Sheets sudah dipublish dan link CSV benar.
+        </div>
+      `;
+    });
 
-let kecSet=[...new Set(data.map(d=>d.kec))];
-document.getElementById("kec").innerHTML="<option value=''>Kecamatan</option>"+kecSet.map(k=>`<option>${k}</option>`).join("");
-}
+  function populateKabupaten() {
+    const kabFilter = document.getElementById("kabFilter");
+    const uniqueKab = [...new Set(allData.map(d => d.kabupaten).filter(Boolean))].sort();
 
-function render(){
-let q=document.getElementById("search").value.toLowerCase();
-let kab=document.getElementById("kab").value;
-let kec=document.getElementById("kec").value;
+    kabFilter.innerHTML = `<option value="">Semua Kabupaten/Kota</option>`;
+    uniqueKab.forEach(kab => {
+      const opt = document.createElement("option");
+      opt.value = kab;
+      opt.textContent = kab;
+      kabFilter.appendChild(opt);
+    });
+  }
 
-let filtered=data.filter(d=>{
-return (!kab||d.kab==kab)&&(!kec||d.kec==kec)&&
-(JSON.stringify(d).toLowerCase().includes(q));
-});
+  function populateKecamatan(sourceData) {
+    const kecFilter = document.getElementById("kecFilter");
+    const currentValue = kecFilter.value;
 
-renderCards(filtered);
-renderMap(filtered);
-}
+    kecFilter.innerHTML = `<option value="">Semua Kecamatan</option>`;
 
-function renderCards(arr){
-let html="";
-arr.forEach(d=>{
-html+=`
-<div class="card">
-<b>${d.desa}</b><br>
-${d.kec} - ${d.kab}<br><br>
+    const uniqueKec = [...new Set(sourceData.map(d => d.kecamatan).filter(Boolean))].sort();
 
-<b>Fasilitator:</b> ${d.pic||"-"}<br>
-<b>Supervisor:</b> ${d.sup||"-"}<br>
-<b>Keterangan:</b> ${d.ket||"-"}
-</div>`;
-});
-document.getElementById("cards").innerHTML=html;
-}
+    uniqueKec.forEach(kec => {
+      const opt = document.createElement("option");
+      opt.value = kec;
+      opt.textContent = kec;
+      kecFilter.appendChild(opt);
+    });
 
-function initMap(){
-map=L.map("map").setView([-0.02,109.34],8);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-}
+    if ([...kecFilter.options].some(o => o.value === currentValue)) {
+      kecFilter.value = currentValue;
+    }
+  }
 
-function renderMap(arr){
-if(!map) return;
+  function populateKeterangan() {
+    const ketFilter = document.getElementById("ketFilter");
+    const uniqueKet = [...new Set(allData.map(d => d.keterangan).filter(Boolean))].sort();
 
-markers.forEach(m=>map.removeLayer(m));
-markers=[];
+    ketFilter.innerHTML = `<option value="">Semua Keterangan</option>`;
+    uniqueKet.forEach(ket => {
+      const opt = document.createElement("option");
+      opt.value = ket;
+      opt.textContent = ket;
+      ketFilter.appendChild(opt);
+    });
+  }
 
-arr.forEach(d=>{
-if(!d.lat||!d.lng) return;
+  function applyFilters() {
+    const q = document.getElementById("searchInput").value.toLowerCase().trim();
+    const kab = document.getElementById("kabFilter").value;
+    const kec = document.getElementById("kecFilter").value;
+    const fas = document.getElementById("fasFilter").value;
+    const ket = document.getElementById("ketFilter").value;
 
-let m=L.marker([d.lat,d.lng]).addTo(map)
-.bindPopup(`<b>${d.desa}</b><br>${d.kec}<br>${d.kab}`);
-markers.push(m);
-});
-}
+    const selectedKab = kab;
+    const sourceForKec = selectedKab
+      ? allData.filter(d => d.kabupaten === selectedKab)
+      : allData;
 
-function showTab(tab){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    populateKecamatan(sourceForKec);
 
-document.getElementById(tab).classList.add("active");
-event.target.classList.add("active");
+    filteredData = allData.filter(d => {
+      const cocokSearch =
+        d.kabupaten.toLowerCase().includes(q) ||
+        d.kecamatan.toLowerCase().includes(q) ||
+        d.desa.toLowerCase().includes(q) ||
+        d.alamat.toLowerCase().includes(q) ||
+        d.namaKades.toLowerCase().includes(q) ||
+        d.namaPic.toLowerCase().includes(q) ||
+        d.supervisor.toLowerCase().includes(q) ||
+        d.keterangan.toLowerCase().includes(q);
 
-setTimeout(()=>{ if(map) map.invalidateSize(); },200);
-}
+      const cocokKab = kab === "" || d.kabupaten === kab;
+      const cocokKec = kec === "" || d.kecamatan === kec;
+      const cocokKet = ket === "" || d.keterangan === ket;
 
-document.getElementById("search").oninput=render;
-document.getElementById("kab").onchange=render;
-document.getElementById("kec").onchange=render;
+      const adaFasilitator = (d.namaPic && d.namaPic.trim() !== "") || (d.hpPic && d.hpPic.trim() !== "");
+      const cocokFas =
+        fas === "" ||
+        (fas === "ada" && adaFasilitator) ||
+        (fas === "kosong" && !adaFasilitator);
+
+      return cocokSearch && cocokKab && cocokKec && cocokFas && cocokKet;
+    });
+
+    renderCards(filteredData);
+    renderMap(filteredData);
+    updateInfoBar(filteredData);
+  }
+
+  function renderCards(data) {
+    const container = document.getElementById("cardsContainer");
+
+    if (!data.length) {
+      container.innerHTML = `
+        <div class="empty">
+          Tidak ada data yang ditemukan.
+        </div>
+      `;
+      return;
+    }
+
+    let html = "";
+
+    data.forEach(d => {
+      html += `
+        <div class="card">
+          <div class="desa-title">${escapeHtml(d.desa)}</div>
+          <div class="wilayah">${escapeHtml(d.kecamatan)} - ${escapeHtml(d.kabupaten)}</div>
+
+          <div class="line"><strong>Alamat Kantor:</strong> ${escapeHtml(d.alamat || "-")}</div>
+          ${
+            d.maps
+              ? `<div class="btn-group">
+                  <a class="btn btn-map" href="${escapeAttr(formatMapLink(d.maps))}" target="_blank">📍 Buka Maps</a>
+                </div>`
+              : ``
+          }
+
+          <div class="section">
+            <h3>Kepala Desa/Lurah</h3>
+            <div class="line"><strong>Nama:</strong> ${escapeHtml(d.namaKades || "-")}</div>
+            <div class="line"><strong>No HP:</strong> ${escapeHtml(maskPhone(d.hpKades))}</div>
+            <div class="btn-group">
+              ${d.hpKades ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpKades)}">📞 Call Kades/Lurah</a>` : ``}
+              ${d.waKades ? `<a class="btn btn-wa" href="${escapeAttr(d.waKades)}" target="_blank">💬 WA Kades/Lurah</a>` : ``}
+              ${d.hpKades ? `<button class="btn btn-copy" onclick="copyText('${escapeJs(d.hpKades)}')">📋 Copy No HP</button>` : ``}
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Fasilitator</h3>
+            <div class="line"><strong>Nama:</strong> ${escapeHtml(d.namaPic || "-")}</div>
+            <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpPic || "-")}</div>
+            <div class="btn-group">
+              ${d.hpPic ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpPic)}">📞 Call Fasilitator</a>` : ``}
+              ${d.waPic ? `<a class="btn btn-wa" href="${escapeAttr(d.waPic)}" target="_blank">💬 WA Fasilitator</a>` : ``}
+              ${d.hpPic ? `<button class="btn btn-copy" onclick="copyText('${escapeJs(d.hpPic)}')">📋 Copy No HP</button>` : ``}
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Supervisor</h3>
+            <div class="line"><strong>Nama:</strong> ${escapeHtml(d.supervisor || "-")}</div>
+            <div class="line"><strong>No HP:</strong> ${escapeHtml(d.hpSupervisor || "-")}</div>
+            <div class="btn-group">
+              ${d.hpSupervisor ? `<a class="btn btn-call" href="tel:${escapeAttr(d.hpSupervisor)}">📞 Call Supervisor</a>` : ``}
+              ${d.waSupervisor ? `<a class="btn btn-wa" href="${escapeAttr(d.waSupervisor)}" target="_blank">💬 WA Supervisor</a>` : ``}
+              ${d.hpSupervisor ? `<button class="btn btn-copy" onclick="copyText('${escapeJs(d.hpSupervisor)}')">📋 Copy No HP</button>` : ``}
+            </div>
+          </div>
+
+          ${
+            d.keterangan
+              ? `<div class="keterangan"><strong>Keterangan:</strong> ${escapeHtml(d.keterangan)}</div>`
+              : ``
+          }
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function initMap() {
+    map = L.map("map").setView([-0.02, 109.34], 8);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    markersLayer = L.layerGroup().addTo(map);
+  }
+
+  function renderMap(data) {
+    if (!map || !markersLayer) return;
+
+    markersLayer.clearLayers();
+    const bounds = [];
+
+    data.forEach(d => {
+      if (d.latitude === null || d.longitude === null) return;
+
+      const adaFasilitator = (d.namaPic && d.namaPic.trim() !== "") || (d.hpPic && d.hpPic.trim() !== "");
+      const marker = L.marker([d.latitude, d.longitude], {
+        icon: createColorMarker(adaFasilitator ? "#0b5cab" : "#d97706")
+      });
+
+      marker.bindPopup(buildPopup(d), { maxWidth: 340 });
+      marker.addTo(markersLayer);
+      bounds.push([d.latitude, d.longitude]);
+    });
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [30, 30] });
+    }
+  }
+
+  function buildPopup(d) {
+    return `
+      <div class="popup-title">${escapeHtml(d.desa || "-")}</div>
+      <div class="popup-line"><strong>Kecamatan:</strong> ${escapeHtml(d.kecamatan || "-")}</div>
+      <div class="popup-line"><strong>Kabupaten/Kota:</strong> ${escapeHtml(d.kabupaten || "-")}</div>
+      <div class="popup-line"><strong>Alamat:</strong> ${escapeHtml(d.alamat || "-")}</div>
+      <div class="popup-line"><strong>Kepala Desa/Lurah:</strong> ${escapeHtml(d.namaKades || "-")}</div>
+      <div class="popup-line"><strong>No HP Kades/Lurah:</strong> ${escapeHtml(maskPhone(d.hpKades))}</div>
+      <div class="popup-line"><strong>Fasilitator:</strong> ${escapeHtml(d.namaPic || "-")}</div>
+      <div class="popup-line"><strong>No HP Fasilitator:</strong> ${escapeHtml(d.hpPic || "-")}</div>
+      <div class="popup-line"><strong>Supervisor:</strong> ${escapeHtml(d.supervisor || "-")}</div>
+      <div class="popup-line"><strong>No HP Supervisor:</strong> ${escapeHtml(d.hpSupervisor || "-")}</div>
+      <div class="popup-line"><strong>Keterangan:</strong> ${escapeHtml(d.keterangan || "-")}</div>
+      ${
+        d.maps
+          ? `<div class="popup-line" style="margin-top:8px;">
+               <a href="${escapeAttr(formatMapLink(d.maps))}" target="_blank">📍 Buka Maps</a>
+             </div>`
+          : ``
+      }
+      ${
+        d.waKades
+          ? `<div class="popup-line"><a href="${escapeAttr(d.waKades)}" target="_blank">💬 WA Kades/Lurah</a></div>`
+          : ``
+      }
+      ${
+        d.waPic
+          ? `<div class="popup-line"><a href="${escapeAttr(d.waPic)}" target="_blank">💬 WA Fasilitator</a></div>`
+          : ``
+      }
+      ${
+        d.waSupervisor
+          ? `<div class="popup-line"><a href="${escapeAttr(d.waSupervisor)}" target="_blank">💬 WA Supervisor</a></div>`
+          : ``
+      }
+    `;
+  }
+
+  function createColorMarker(color) {
+    return L.divIcon({
+      className: "",
+      html: `<div style="width:18px;height:18px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.25);"></div>`,
+      iconSize: [18, 18],
+      iconAnchor: [9, 9]
+    });
+  }
+
+  function updateInfoBar(data) {
+    document.getElementById("totalData").textContent = `Total data: ${data.length}`;
+    const mapReady = data.filter(d => d.latitude !== null && d.longitude !== null).length;
+    document.getElementById("mapReadyInfo").textContent = `Titik peta siap: ${mapReady}`;
+  }
+
+  function parseCoordinate(value) {
+    if (!value) return null;
+    const cleaned = String(value).trim().replace(",", ".");
+    const num = parseFloat(cleaned);
+    return Number.isFinite(num) ? num : null;
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("Nomor berhasil disalin"))
+      .catch(() => alert("Gagal menyalin nomor"));
+  }
+
+  function formatMapLink(link) {
+    if (!link) return "#";
+    link = link.trim();
+
+    if (link.startsWith("http://") || link.startsWith("https://")) {
+      return link;
+    }
+
+    if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(link)) {
+      return "https://www.google.com/maps?q=" + encodeURIComponent(link);
+    }
+
+    return "https://www.google.com/maps?q=" + encodeURIComponent(link);
+  }
+
+  function maskPhone(phone) {
+    if (!phone) return "-";
+    phone = String(phone).trim();
+    if (phone.length <= 4) return "xxxx";
+    return phone.slice(0, -4) + "xxxx";
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function escapeAttr(str) {
+    return String(str).replace(/"/g, "&quot;");
+  }
+
+  function escapeJs(str) {
+    return String(str).replace(/'/g, "\\'");
+  }
+
+  document.getElementById("searchInput").addEventListener("input", applyFilters);
+  document.getElementById("kabFilter").addEventListener("change", applyFilters);
+  document.getElementById("kecFilter").addEventListener("change", applyFilters);
+  document.getElementById("fasFilter").addEventListener("change", applyFilters);
+  document.getElementById("ketFilter").addEventListener("change", applyFilters);
+
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+      this.classList.add("active");
+      document.getElementById(this.dataset.tab).classList.add("active");
+
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+      }, 250);
+    });
+  });
 </script>
 
 </body>
