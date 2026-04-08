@@ -250,6 +250,28 @@
       color: #6b7280;
     }
 
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
     .popup-title {
       font-size: 16px;
       font-weight: bold;
@@ -323,9 +345,9 @@
   </div>
 
   <div class="info-bar">
-    <div class="badge" id="totalData">Total data: 0</div>
+    <div class="badge" id="totalData">Total data tabel: 0</div>
     <div class="muted" id="mapReadyInfo">Titik peta siap: 0</div>
-    <div class="muted">Data ditarik dari Google Sheets</div>
+    <div class="muted">Sumber: Google Sheets</div>
   </div>
 
   <div id="tabData" class="tab-content active">
@@ -333,6 +355,10 @@
   </div>
 
   <div id="tabMap" class="tab-content">
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#0b5cab;"></span> Ada Fasilitator</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#d97706;"></span> Belum Ada Fasilitator</div>
+    </div>
     <div class="map-note">
       Klik marker untuk melihat informasi lengkap desa/kelurahan, kepala desa/lurah, fasilitator, supervisor, dan keterangan.
     </div>
@@ -345,22 +371,55 @@
 </div>
 
 <script>
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPyuoCrNpaEwPjcRJVIznXvqZDPE3jtl66VlIUy10slnRIxO_gyKN4HCVKAY1p_mFAhgtv_t0XTJdJ/pub?gid=362240994&single=true&output=csv";
+  // GANTI LINK INI DENGAN CSV SHEET FULL 2146
+  const CSV_TABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPyuoCrNpaEwPjcRJVIznXvqZDPE3jtl66VlIUy10slnRIxO_gyKN4HCVKAY1p_mFAhgtv_t0XTJdJ/pub?gid=0&single=true&output=csv";
+
+  // LINK DATA_MAP YANG SUDAH ADA LATITUDE-LONGITUDE
+  const CSV_MAP = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRPyuoCrNpaEwPjcRJVIznXvqZDPE3jtl66VlIUy10slnRIxO_gyKN4HCVKAY1p_mFAhgtv_t0XTJdJ/pub?gid=362240994&single=true&output=csv";
 
   let allData = [];
+  let mapData = [];
   let filteredData = [];
   let map;
   let markersLayer;
 
-  fetch(CSV_URL)
-    .then(res => {
-      if (!res.ok) throw new Error("Gagal mengambil data dari Google Sheets");
+  Promise.all([
+    fetch(CSV_TABLE).then(res => {
+      if (!res.ok) throw new Error("Gagal mengambil data tabel");
+      return res.text();
+    }),
+    fetch(CSV_MAP).then(res => {
+      if (!res.ok) throw new Error("Gagal mengambil data peta");
       return res.text();
     })
-    .then(csv => {
-      const rows = csv.trim().split("\n").slice(1);
+  ])
+  .then(([csvTable, csvMap]) => {
+    allData = parseCSV(csvTable);
+    mapData = parseCSV(csvMap);
 
-      allData = rows.map(row => {
+    populateKabupaten();
+    populateKeterangan();
+    populateKecamatan(allData);
+    initMap();
+    applyFilters();
+  })
+  .catch(error => {
+    console.error(error);
+    document.getElementById("cardsContainer").innerHTML = `
+      <div class="empty">
+        Gagal memuat data. Pastikan link CSV sheet full dan Data_Map benar.
+      </div>
+    `;
+  });
+
+  function parseCSV(csv) {
+    const lines = csv.trim().split(/\r?\n/);
+    if (lines.length <= 1) return [];
+
+    const rows = lines.slice(1);
+
+    return rows
+      .map(row => {
         const c = row
           .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
           .map(v => v.replace(/^"|"$/g, "").trim());
@@ -384,22 +443,12 @@
           latitude: parseCoordinate(c[15]),
           longitude: parseCoordinate(c[16])
         };
-      });
-
-      populateKabupaten();
-      populateKeterangan();
-      populateKecamatan(allData);
-      initMap();
-      applyFilters();
-    })
-    .catch(error => {
-      console.error(error);
-      document.getElementById("cardsContainer").innerHTML = `
-        <div class="empty">
-          Gagal memuat data. Pastikan Google Sheets sudah dipublish dan link CSV benar.
-        </div>
-      `;
-    });
+      })
+      .filter(d =>
+        d.kabupaten || d.kecamatan || d.desa || d.alamat || d.namaKades ||
+        d.namaPic || d.supervisor || d.keterangan
+      );
+  }
 
   function populateKabupaten() {
     const kabFilter = document.getElementById("kabFilter");
@@ -454,9 +503,8 @@
     const fas = document.getElementById("fasFilter").value;
     const ket = document.getElementById("ketFilter").value;
 
-    const selectedKab = kab;
-    const sourceForKec = selectedKab
-      ? allData.filter(d => d.kabupaten === selectedKab)
+    const sourceForKec = kab
+      ? allData.filter(d => d.kabupaten === kab)
       : allData;
 
     populateKecamatan(sourceForKec);
@@ -485,9 +533,31 @@
       return cocokSearch && cocokKab && cocokKec && cocokFas && cocokKet;
     });
 
+    const filteredMap = filterMapDataByTable(filteredData, mapData);
+
     renderCards(filteredData);
-    renderMap(filteredData);
-    updateInfoBar(filteredData);
+    renderMap(filteredMap);
+    updateInfoBar(filteredData, filteredMap);
+  }
+
+  function filterMapDataByTable(tableRows, mapRows) {
+    const keySet = new Set(
+      tableRows.map(d => buildKey(d.kabupaten, d.kecamatan, d.desa))
+    );
+
+    return mapRows.filter(d => keySet.has(buildKey(d.kabupaten, d.kecamatan, d.desa)));
+  }
+
+  function buildKey(kabupaten, kecamatan, desa) {
+    return [
+      safeLower(kabupaten),
+      safeLower(kecamatan),
+      safeLower(desa)
+    ].join("||");
+  }
+
+  function safeLower(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
   function renderCards(data) {
@@ -614,9 +684,7 @@
       <div class="popup-line"><strong>Keterangan:</strong> ${escapeHtml(d.keterangan || "-")}</div>
       ${
         d.maps
-          ? `<div class="popup-line" style="margin-top:8px;">
-               <a href="${escapeAttr(formatMapLink(d.maps))}" target="_blank">📍 Buka Maps</a>
-             </div>`
+          ? `<div class="popup-line" style="margin-top:8px;"><a href="${escapeAttr(formatMapLink(d.maps))}" target="_blank">📍 Buka Maps</a></div>`
           : ``
       }
       ${
@@ -646,10 +714,9 @@
     });
   }
 
-  function updateInfoBar(data) {
-    document.getElementById("totalData").textContent = `Total data: ${data.length}`;
-    const mapReady = data.filter(d => d.latitude !== null && d.longitude !== null).length;
-    document.getElementById("mapReadyInfo").textContent = `Titik peta siap: ${mapReady}`;
+  function updateInfoBar(tableRows, mapRows) {
+    document.getElementById("totalData").textContent = `Total data tabel: ${tableRows.length}`;
+    document.getElementById("mapReadyInfo").textContent = `Titik peta siap: ${mapRows.length}`;
   }
 
   function parseCoordinate(value) {
